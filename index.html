@@ -3,27 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DESIGNER MISSION 1000: TRENDING EDITION</title>
-    <script src="https://html2canvas.hertzen.com"></script>
+    <title>TAIWAN DESIGNER MISSION 1000</title>
+    <!-- 穩定版截圖套件 -->
+    <script src="https://cdnjs.cloudflare.com"></script>
     <style>
         :root { --primary: #00f2fe; --accent: #ff4757; --gold: #f9d423; --bg: #0b0e14; --glass: rgba(255, 255, 255, 0.05); }
         body { font-family: 'Inter', 'PingFang TC', sans-serif; background: var(--bg); color: #e0e0e0; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
         
+        /* 導覽列 */
         .top-nav { width: 100%; background: var(--glass); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 10px 0; position: sticky; top: 0; z-index: 100; }
         .selector-group { display: flex; justify-content: center; gap: 8px; }
         .mode-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: 0.3s; }
         .mode-btn.active { background: var(--primary); color: #000; font-weight: bold; border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
         
-        /* 趨勢輸入框 */
-        .trend-box { width: 85vw; max-width: 380px; margin: 15px 0; position: relative; }
-        #trendInput { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #333; background: #161b22; color: #fff; font-size: 0.9rem; box-sizing: border-box; outline: none; transition: 0.3s; }
-        #trendInput:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0,242,254,0.2); }
+        /* 趨勢輸入 */
+        .trend-box { width: 85vw; max-width: 380px; margin: 15px 0; }
+        #trendInput { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #333; background: #161b22; color: #fff; font-size: 0.9rem; box-sizing: border-box; outline: none; }
 
+        /* 難度切換 */
         .diff-selector { display: flex; justify-content: center; gap: 15px; margin: 10px 0; }
-        .diff-btn { background: none; border: 2px solid #333; color: #666; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 0.85rem; }
+        .diff-btn { background: none; border: 2px solid #333; color: #666; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: 0.3s; }
         .diff-btn.active.easy { border-color: #2ed573; color: #2ed573; }
         .diff-btn.active.hell { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(255,71,87,0.2); }
 
+        /* 任務卡片 */
         .mission-card { background: linear-gradient(145deg, #161b22, #0b0e14); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 24px; width: 85vw; max-width: 380px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .day-tag { background: var(--gold); color: #000; padding: 2px 10px; border-radius: 4px; font-weight: 900; font-size: 0.8rem; }
@@ -32,18 +35,22 @@
         canvas { width: 100%; height: 100%; border-radius: 50%; border: 6px solid #1a1e26; transition: transform 5s cubic-bezier(0.15, 0, 0.2, 1); }
         .pointer { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid var(--primary); z-index: 10; filter: drop-shadow(0 0 8px var(--primary)); }
 
-        #spinBtn { background: #fff; border: none; width: 100%; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; transition: 0.3s; margin-bottom: 15px; letter-spacing: 1px; }
+        #spinBtn { background: #fff; border: none; width: 100%; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; margin-bottom: 15px; letter-spacing: 1px; }
         #spinBtn:disabled { background: #333; color: #555; }
 
+        /* 結果展示 */
         #topicDisplay { text-align: left; min-height: 140px; border-left: 3px solid var(--primary); padding-left: 15px; }
         .res-style { color: var(--gold); font-size: 0.7rem; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; }
         .res-title { font-size: 1.4rem; color: #fff; margin: 5px 0; font-weight: 800; }
         .res-hell { color: var(--accent); font-size: 0.8rem; font-weight: bold; margin-bottom: 12px; border: 1px dashed var(--accent); padding: 4px 8px; display: inline-block; }
         .res-copy-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid rgba(0,242,254,0.3); }
 
-        .screenshot-btn { background: none; border: 1px solid #444; color: #888; padding: 12px; border-radius: 10px; cursor: pointer; margin: 20px 0; width: 85vw; max-width: 380px; font-size: 0.85rem; font-weight: bold; }
-        .screenshot-btn:hover { background: #fff; color: #000; }
+        .screenshot-btn { background: none; border: 1px solid #444; color: #888; padding: 15px; border-radius: 10px; cursor: pointer; margin: 20px 0; width: 85vw; max-width: 380px; font-size: 0.9rem; font-weight: bold; }
         .reset-link { font-size: 0.7rem; color: #333; cursor: pointer; margin-bottom: 40px; }
+        
+        /* 截圖預覽層 */
+        #screenshotOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        #screenshotOverlay img { max-width: 100%; max-height: 75%; border-radius: 15px; border: 2px solid var(--primary); margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -59,7 +66,7 @@
 </div>
 
 <div class="trend-box">
-    <input type="text" id="trendInput" placeholder="🔥 填入今日時事或網路梗 (留白由程式抽籤)">
+    <input type="text" id="trendInput" placeholder="🔥 填入今日時事或網路梗 (選填)">
 </div>
 
 <div class="diff-selector">
@@ -69,31 +76,36 @@
 
 <div class="mission-card" id="captureArea">
     <div class="card-header">
-        <div style="font-size: 0.6rem; color: #555; letter-spacing: 1px;">TAIWAN DESIGN MISSION</div>
+        <div style="font-size: 0.6rem; color: #555; letter-spacing: 1px;">DESIGN MISSION</div>
         <div class="day-tag" id="dayDisplay">DAY 01</div>
     </div>
-
     <div class="wheel-box">
         <div class="pointer"></div>
         <canvas id="wheelCanvas" width="800" height="800"></canvas>
     </div>
-
     <button id="spinBtn" onclick="spin()">SPIN MISSION</button>
-
     <div id="topicDisplay">
         <div class="res-style">Status: Ready</div>
         <div class="res-title">Awaiting Draw...</div>
     </div>
 </div>
 
-<button class="screenshot-btn" onclick="takeScreenshot()">📷 儲存任務卡片 (分享至 Threads/IG)</button>
+<button class="screenshot-btn" id="shotBtn" onclick="takeScreenshot()">📸 儲存任務卡片 (分享至 Threads/IG)</button>
 <div class="reset-link" onclick="resetCurrentMode()">重置當前進度</div>
+
+<!-- 截圖預覽容器 -->
+<div id="screenshotOverlay">
+    <div style="color:var(--primary); font-weight:bold; margin-bottom:10px;">✨ 任務卡生成成功 ✨</div>
+    <div style="color:#aaa; font-size:0.8rem; margin-bottom:20px;">請【長按圖片】儲存至相簿</div>
+    <img id="screenshotImg" src="">
+    <button onclick="document.getElementById('screenshotOverlay').style.display='none'" style="background:#fff; border:none; padding:10px 30px; border-radius:10px; font-weight:bold;">關閉預覽</button>
+</div>
 
 <script>
 const data = {
     styles: ["注音符號視覺化","老牌店標重構","宮廟霓虹美學","變電箱山水感","長輩圖色彩實驗","霓虹檳榔攤","台式拼貼風格","極簡主義","酸性設計","賽博龐克","瑞士風格","包浩斯","復古拼貼","波普藝術","蒸汽波","新醜風","幾何抽象","故障藝術","日系治癒","歐普藝術","野獸派","超現實","粗獷主義","孟菲斯","浮世繪","街頭塗鴉","擬物化","扁平化 2.0","達達主義","哥德風","像素藝術","水墨書法","電影質感","老雜誌風","未來主義","暗黑美學"],
     hell: ["禁止使用現成中文字體","僅限使用台式紅藍綠配色","加入檳榔攤跑馬燈效果","必須包含窗花或鐵捲門紋理","限制雙色(Duotone)","禁止使用任何圖片","僅限 3 種字體大小","必須垂直排版文字","文字必須發生重疊","加入大量 Grain 雜訊","強迫使用螢光色對比","以圓形核心構圖","使用非對稱網格"],
-    issues: ["孤獨","希望","迷宮","黑洞","漂浮","森林","清晨","暴風夜","塑膠污染","孤獨的老人","焦慮","平靜","喜悅","迷失","自由","羞怯","叛逆","想念","時間","記憶","距離","平衡","邊界","風","雨","月亮","海浪","沙漠","火焰","全球暖化","空汙","過勞","食物浪費","水資源","城市更新","共享經濟","心理健康","網路霸凌","性別平等","獨居老人","漂浮的塑膠","透明","霓虹","陰影","光","噪音","靜止","錯誤","夢","黑洞訊號","外星訊號","未來","過去","平行世界","時空裂縫","宇宙郵局","太空垃圾","月球散步","午夜","夏日午後","冬天","廢墟","洞穴","城市","海邊","山頂","迷宮出口","寶藏","秘密","信號","旅途","收藏","遺失","能量","密碼","未知","旋轉","停止","凝結","爆炸","消失","墜落","等待","逃跑","孤獨的城市","迷失的海邊","漂浮的星塵","孤單的行人","空氣污染","森林砍伐","環境破壞","老齡化","移民故事","AI監控","數位隱私","塑膠漂流","社區連結","交通擁擠","共享單車","暴力事件","無家者","社會貧困","能源浪費","氣候異常","生態保護","城市綠化","心跳","呼吸","聲音","氣味","觸感","震動","溫度","味道","回聲","靜默","鑰匙","鏡子","窗戶","椅子","門","燈","信封","時鐘","梯子","箱子","孤獨的辦公室","迷宮中的監控","漂浮的垃圾","黑洞裡的希望","漂浮的海洋垃圾","森林裡的煙霧","城市裡的孤單","霧中的影子","暴風夜的街道","光影下的抗議","星光下的難民","透明的塑膠","霓虹的城市","陰影裡的貧困","錯誤的決策","秩序","混亂","偶然","選擇","無限","雲","星星","雷","生長","黑夜裡的孤單","漂浮的希望","旋轉的城市","沉睡的森林","消失的記憶","爆炸的情緒","凝結的光","墜落的夢","透明的世界","霓虹的未來","陰影下的抗議","光線裡的寧靜","噪音城市","靜止的時間","錯誤的選擇","迷宮之心","寶藏的祕密","信號失靈","旅途的回聲","收藏的遺失","能量的流動","密碼破解","未知的旅程","孤單的夜行者","城市邊界","森林深處","山頂日出","海邊潮汐","月光下的希望","太空之旅","外星漂流","黑洞迷宮","數位虛擬","監控之眼","環境保護","社會公正","和平願景","可持續能源","文化傳承","教育平等","公共藝術","社區活動","街頭觀察","人群流動","光影紀錄","聲音地圖","氣味記憶","觸感探索","動態影像","情緒表達","視覺隱喻","設計思考","社會實驗","心理投射","日常觀察","都市故事","環境議題","公共議題","文化觀察"]
+    issues: ["孤獨","希望","迷宮","黑洞","漂浮","森林","清晨","暴風夜","塑膠污染","孤獨的老人","焦慮","平靜","喜悅","迷失","自由","羞怯","叛逆","想念","時間","記憶","距離","平衡","邊界","風","雨","月亮","海浪","沙漠","火焰","全球暖化","空汙","過勞","食物浪費","水資源","城市更新","共享經濟","心理健康","網路霸凌","性別平等","獨居老人","透明","霓虹","陰影","光","噪音","靜止","錯誤","夢","黑洞訊號","外星訊號","未來","過去","平行世界","時空裂縫","宇宙郵局","太空垃圾","月球散步","午夜","夏日午後","冬天","廢墟","洞穴","城市","海邊","山頂","寶藏","秘密","信號","旅途","能量","未知","旋轉","消失","墜落","等待","逃跑","AI監控","數位隱私","社區連結","氣候異常","老齡化","心跳","呼吸","聲音","鏡子","鑰匙","時鐘"]
 };
 
 let currentMode = 100, topics = [], currentRotation = 0, isSpinning = false, difficulty = 'easy';
@@ -109,7 +121,7 @@ function changeMode(days) {
     if(isSpinning) return;
     currentMode = days;
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', parseInt(b.innerText) === days));
-    let saved = localStorage.getItem(`vtrend_mode_${days}`);
+    let saved = localStorage.getItem(`vfinal_mode_${days}`);
     topics = saved ? JSON.parse(saved) : Array.from({length: days}, (_, i) => data.styles[i % data.styles.length]);
     document.getElementById('dayDisplay').innerText = `DAY ${String(currentMode - topics.length + 1).padStart(2, '0')}`;
     drawWheel();
@@ -129,57 +141,48 @@ function spin() {
     if(isSpinning || topics.length === 0) return;
     const trend = document.getElementById('trendInput').value.trim();
     isSpinning = true; document.getElementById('spinBtn').disabled = true;
-    
     let idx = Math.floor(Math.random()*topics.length);
     let rot = currentRotation + (360*10) + (360 - (idx*(360/topics.length)) - (180/topics.length));
     canvas.style.transform = `rotate(${rot}deg)`;
     currentRotation = rot;
-
     setTimeout(() => {
         const style = topics[idx];
         const hellConstraint = difficulty === 'hell' ? `✕ ${data.hell[Math.floor(Math.random()*data.hell.length)]}` : "";
         const finalTopic = trend ? trend : data.issues[Math.floor(Math.random()*data.issues.length)];
         const currentDay = currentMode - topics.length + 1;
-        
         document.getElementById('dayDisplay').innerText = `DAY ${String(currentDay).padStart(2, '0')}`;
-        document.getElementById('topicDisplay').innerHTML = `
-            <div class="res-style">MISSION START</div>
-            <div class="res-title">${style}</div>
-            ${difficulty === 'hell' ? `<div class="res-hell">${hellConstraint}</div>` : ''}
-            <div class="res-copy-box">
-                <div style="font-size:0.6rem; color:var(--primary); letter-spacing:1px; margin-bottom:5px;">${trend ? '🔥 TRENDING' : 'CORE SUBJECT'}</div>
-                <div style="font-size:1.5rem; font-weight:900; color:#fff; line-height:1.2;">${finalTopic}</div>
-            </div>
-        `;
-
+        document.getElementById('topicDisplay').innerHTML = `<div class="res-style">MISSION START</div><div class="res-title">${style}</div>${difficulty==='hell'?`<div class="res-hell">${hellConstraint}</div>`:''}<div class="res-copy-box"><div style="font-size:0.6rem; color:var(--primary); letter-spacing:1px; margin-bottom:5px;">SUBJECT</div><div style="font-size:1.5rem; font-weight:900; color:#fff;">${finalTopic}</div></div>`;
         topics.splice(idx, 1);
-        localStorage.setItem(`vtrend_mode_${currentMode}`, JSON.stringify(topics));
+        localStorage.setItem(`vfinal_mode_${currentMode}`, JSON.stringify(topics));
         isSpinning = false; document.getElementById('spinBtn').disabled = false;
         setTimeout(drawWheel, 1000);
     }, 5000);
 }
 
 function takeScreenshot() {
+    if (typeof html2canvas === 'undefined') { alert("載入中，請稍候再試..."); return; }
     const area = document.getElementById('captureArea');
-    html2canvas(area, { backgroundColor: "#0b0e14", scale: 3 }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `PosterTask_Day.png`;
-        link.href = canvas.toDataURL();
-        link.click();
+    const shotBtn = document.getElementById('shotBtn');
+    shotBtn.innerText = "📸 生成中...";
+    
+    html2canvas(area, { backgroundColor: "#0b0e14", scale: 2, useCORS: true }).then(canvas => {
+        const imgData = canvas.toDataURL("image/png");
+        document.getElementById('screenshotImg').src = imgData;
+        document.getElementById('screenshotOverlay').style.display = 'flex';
+        shotBtn.innerText = "📸 儲存任務卡片 (分享至 Threads/IG)";
+    }).catch(err => {
+        alert("截圖失敗，請嘗試手動截圖。");
+        shotBtn.innerText = "📸 儲存任務卡片 (分享至 Threads/IG)";
     });
 }
 
-function resetCurrentMode() {
-    if(confirm("重置進度？")) {
-        localStorage.removeItem(`vtrend_mode_${currentMode}`);
-        changeMode(currentMode);
-    }
-}
-
+function resetCurrentMode() { if(confirm("重置進度？")) { localStorage.removeItem(`vfinal_mode_${currentMode}`); changeMode(currentMode); } }
 changeMode(100);
 </script>
 </body>
 </html>
+
+
 
 
 
