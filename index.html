@@ -1,0 +1,47 @@
+// 創意矩陣：透過組合生成 1000+ 不重複題目
+const matrix = {
+    styles: ["極簡","酸性","賽博","瑞士","包浩斯","拼貼","波普","蒸汽波","新醜風","幾何","故障","日系","歐普","野獸派","超現實","粗獷主義","孟菲斯","新古典","浮世繪","街頭","擬物","扁平化","達達","哥德","重金屬","粉彩","低多邊形","像素","水墨","電影質感","老雜誌","霓虹","報紙","未來主義","動漫","暗黑","數位油畫","民族圖騰","光影","剪影"],
+    elements: ["時光","深海","宇宙","森林","大腦","心跳","數據","齒輪","花卉","昆蟲","建築","迷宮","黑洞","流體","冰晶","煙霧","金屬","陶瓷","絲綢","沙漏"],
+    actions: ["轉譯","重構","碰撞","溶解","漂浮","碎裂","疊加","對話","隱藏","曝光"]
+};
+
+function generate1000Topics() {
+    let result = [];
+    // 優先放入基礎 50 題確保經典風格都在
+    result = [...baseLibrary]; 
+    
+    // 開始組合剩餘題目
+    while(result.length < 1000) {
+        let s = matrix.styles[Math.floor(Math.random() * matrix.styles.length)];
+        let e = matrix.elements[Math.floor(Math.random() * matrix.elements.length)];
+        let a = matrix.actions[Math.floor(Math.random() * matrix.actions.length)];
+        let combo = `${s}風：${e}的${a}`;
+        
+        if(!result.includes(combo)) {
+            result.push(combo);
+        }
+    }
+    return result;
+}
+
+// 修改後的 changeMode 加入 1000 選項
+function changeMode(days) {
+    if(isSpinning) return;
+    currentMode = days;
+    
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.innerText) === days || (btn.innerText==='1000天' && days===1000));
+    });
+    
+    const saved = localStorage.getItem(`poster_mode_${days}`);
+    if (saved) {
+        topics = JSON.parse(saved);
+    } else {
+        topics = (days >= 1000) ? generate1000Topics() : generateTopics(days);
+        saveProgress();
+    }
+    
+    document.getElementById('modeName').innerText = days;
+    document.getElementById('total').innerText = days;
+    drawWheel();
+}
