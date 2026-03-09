@@ -4,127 +4,187 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>POSTER MISSION 1000</title>
-    <!-- 使用最穩定的 CDN -->
-    <script src="https://cdnjs.cloudflare.com"></script>
     <style>
-        :root { --primary: #00f2fe; --accent: #ff4757; --gold: #f9d423; --bg: #0b0e14; }
-        body { font-family: sans-serif; background: var(--bg); color: #e0e0e0; margin: 0; text-align: center; -webkit-font-smoothing: antialiased; }
+        :root { --primary: #00f2fe; --accent: #ff4757; --gold: #f9d423; --bg: #0b0e14; --glass: rgba(255, 255, 255, 0.05); }
+        body { font-family: 'Inter', 'PingFang TC', sans-serif; background: var(--bg); color: #e0e0e0; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
         
-        /* 啟動遮罩 (解鎖音效用) */
+        /* 啟動遮罩 */
         #startOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .start-btn { background: var(--primary); color: #000; border: none; padding: 20px 40px; border-radius: 50px; font-weight: bold; font-size: 1.5rem; cursor: pointer; }
+        .start-btn { background: var(--primary); color: #000; border: none; padding: 18px 40px; border-radius: 50px; font-weight: bold; font-size: 1.3rem; cursor: pointer; box-shadow: 0 0 20px var(--primary); }
 
-        .mission-card { background: #161b22; border: 1px solid #333; padding: 20px; border-radius: 20px; width: 85vw; max-width: 350px; margin: 20px auto; position: relative; }
-        canvas { width: 100%; height: 100%; border-radius: 50%; border: 5px solid #000; transition: transform 5s cubic-bezier(0.15, 0, 0.2, 1); }
-        .day-tag { position: absolute; top: 15px; right: 15px; background: var(--gold); color: #000; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .top-nav { width: 100%; background: var(--glass); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 10px 0; position: sticky; top: 0; z-index: 100; display: flex; justify-content: center; gap: 8px; }
+        .mode-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; }
+        .mode-btn.active { background: var(--primary); color: #000; font-weight: bold; border-color: var(--primary); }
         
-        #spinBtn { background: #fff; color: #000; border: none; width: 80%; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 1.2rem; margin: 15px 0; }
-        #topicDisplay { text-align: left; border-left: 4px solid var(--primary); padding-left: 15px; margin-top: 15px; min-height: 100px; }
+        .diff-selector { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
+        .diff-btn { background: none; border: 2px solid #333; color: #666; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
+        .diff-btn.active.easy { border-color: #2ed573; color: #2ed573; }
+        .diff-btn.active.hell { border-color: var(--accent); color: var(--accent); }
+
+        .mission-card { background: #161b22; border: 1px solid #333; padding: 25px; border-radius: 24px; width: 85vw; max-width: 380px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); margin-top: 10px; }
+        .day-tag { position: absolute; top: 15px; right: 15px; background: var(--gold); color: #000; padding: 2px 10px; border-radius: 4px; font-weight: 900; font-size: 0.8rem; }
         
-        /* 截圖顯示區 */
-        #previewContainer { margin-top: 30px; display: none; padding: 20px; }
-        #previewContainer img { width: 100%; border: 2px solid var(--primary); border-radius: 10px; }
+        .wheel-box { position: relative; width: 100%; aspect-ratio: 1; margin: 20px 0; }
+        canvas { width: 100%; height: 100%; border-radius: 50%; border: 6px solid #1a1e26; transition: transform 5s cubic-bezier(0.15, 0, 0.2, 1); }
+        .pointer { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid var(--primary); z-index: 10; filter: drop-shadow(0 0 8px var(--primary)); }
+
+        #spinBtn { background: #fff; border: none; width: 100%; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; margin-bottom: 15px; color:#000; }
+        #topicDisplay { text-align: left; min-height: 120px; border-left: 3px solid var(--primary); padding-left: 15px; }
+        .res-style { color: var(--gold); font-size: 0.7rem; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; }
+        .res-title { font-size: 1.4rem; color: #fff; margin: 5px 0; font-weight: 800; }
+        .res-hell { color: var(--accent); font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; border: 1px dashed var(--accent); padding: 4px; display: inline-block; }
+        .res-copy-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-top: 10px; }
+        
+        .hint { font-size: 0.75rem; color: #555; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-<!-- 第一步：點擊解鎖音效 -->
 <div id="startOverlay">
-    <h1 style="color:var(--gold)">POSTER 1000</h1>
-    <p>準備好開始挑戰了嗎？</p>
-    <button class="start-btn" onclick="initGame()">啟動挑戰</button>
+    <h1 style="color:var(--gold); letter-spacing:3px;">POSTER 1000</h1>
+    <button class="start-btn" onclick="initGame()">ENTER CHALLENGE</button>
 </div>
 
-<div class="mission-card" id="captureArea">
-    <div class="day-tag" id="dayDisplay">DAY 01</div>
-    <div style="width:100%; aspect-ratio:1; position:relative; margin-bottom:15px;">
-        <div style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-top:20px solid var(--accent); z-index:10;"></div>
-        <canvas id="wheelCanvas" width="600" height="600"></canvas>
+<div class="top-nav">
+    <button class="mode-btn" onclick="changeMode(7)">7D</button>
+    <button class="mode-btn" onclick="changeMode(30)">30D</button>
+    <button class="mode-btn active" onclick="changeMode(100)">100D</button>
+    <button class="mode-btn" onclick="changeMode(365)">365D</button>
+    <button class="mode-btn" onclick="changeMode(1000)">1000D</button>
+</div>
+
+<div class="diff-selector">
+    <button id="easyBtn" class="diff-btn easy active" onclick="setDiff('easy')">輕鬆練習</button>
+    <button id="hellBtn" class="diff-btn hell" onclick="setDiff('hell')">設計師地獄</button>
+</div>
+
+<div class="mission-card">
+    <div class="day-tag" id="dayDisplay">DAY --</div>
+    <div class="wheel-box">
+        <div class="pointer"></div>
+        <canvas id="wheelCanvas" width="800" height="800"></canvas>
     </div>
-    <button id="spinBtn" onclick="spin()">開始抽題</button>
+    <button id="spinBtn" onclick="spin()">SPIN MISSION</button>
     <div id="topicDisplay">
-        <div style="font-size:0.7rem; color:var(--gold)">MISSION</div>
-        <div id="resTitle" style="font-size:1.3rem; font-weight:bold; margin:5px 0">等待轉盤...</div>
-        <div id="resSub" style="font-size:0.9rem; color:#888;"></div>
+        <div class="res-style">Status: Ready</div>
+        <div class="res-title">Awaiting Draw...</div>
     </div>
-    <div id="signLabel" style="font-size:0.6rem; color:#444; text-align:right; margin-top:10px;">@your_id</div>
 </div>
 
-<button style="background:none; border:1px solid #444; color:#888; padding:10px; border-radius:5px;" onclick="genImg()">📸 生成截圖 (長按儲存)</button>
-
-<div id="previewContainer">
-    <p style="color:var(--primary)">✨ 任務卡已生成！請長按圖片儲存 ✨</p>
-    <img id="finalImg" src="">
-</div>
+<p class="hint">💡 抽到題目後請手動「截圖」分享</p>
+<div style="font-size:0.7rem; color:#333; cursor:pointer; margin-bottom:30px;" onclick="resetCurrentMode()">重置進度</div>
 
 <script>
-let audioCtx, topics = [], isSpinning = false;
+let audioCtx, isSpinning = false, currentMode = 100, difficulty = 'easy', topics = [], currentRotation = 0;
 const canvas = document.getElementById('wheelCanvas'), ctx = canvas.getContext('2d');
+
+const data = {
+    styles: ["注音視覺化","老牌店標","宮廟美學","變電箱山水","長輩圖色彩","霓虹檳榔攤","台式拼貼","極簡主義","酸性設計","賽博龐克","瑞士風格","包浩斯","復古拼貼","波普藝術","蒸汽波","新醜風","幾何抽象","故障藝術","日系治癒","歐普藝術","野獸派","超現實","粗獷主義","孟菲斯","浮世繪","街頭塗鴉","擬物化","扁平化 2.0","達達主義","哥德風","像素藝術","水墨書法","電影質感","老雜誌風","未來主義","暗黑美學"],
+    hell: ["禁止使用現成中文字體","僅限台式紅藍綠配色","加入跑馬燈效果","必須包含鐵捲門紋理","限制雙色(Duotone)","禁止使用任何圖片","僅限 3 種字體大小","必須垂直排版","文字必須重疊","加入大量 Grain 雜訊","強迫使用螢光色","使用非對稱網格"],
+    issues: ["孤獨","希望","迷宮","黑洞","漂浮","森林","清晨","暴風夜","塑膠污染","孤獨的老人","焦慮","平靜","喜悅","迷失","自由","叛逆","時間","記憶","距離","平衡","邊界","風","雨","月亮","海浪","沙漠","火焰","全球暖化","空汙","食物浪費","心理健康","網路霸凌","性別平等","獨居老人","透明","霓虹","噪音","靜止","夢","時空裂縫","太空垃圾","月球散步","午夜","廢墟","未知","旋轉","消失","墜落","等待","AI監控","數位隱私","老齡化","心跳"]
+};
 
 function initGame() {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     document.getElementById('startOverlay').style.display = 'none';
-    const savedId = prompt("請輸入您的 IG 帳號：", "@designer_name");
-    if(savedId) document.getElementById('signLabel').innerText = savedId;
-    loadTopics();
+    changeMode(100);
 }
 
-function playSnd(freq, dur) {
+function playTick() {
     if(!audioCtx) return;
     const osc = audioCtx.createOscillator();
     const g = audioCtx.createGain();
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.05);
+    g.gain.setValueAtTime(0.05, audioCtx.currentTime);
     osc.connect(g); g.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + dur);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.05);
 }
 
-function loadTopics() {
-    topics = JSON.parse(localStorage.getItem('poster_final')) || ["注音視覺化","老牌店標","宮廟美學","變電箱山水","酸性設計","極簡主義","賽博龐克","瑞士風格","包浩斯","復古拼貼"];
-    draw();
+function playWin() {
+    if(!audioCtx) return;
+    [523.25, 659.25, 783.99].forEach((f, i) => {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.frequency.setValueAtTime(f, audioCtx.currentTime + i * 0.1);
+        g.gain.setValueAtTime(0.05, audioCtx.currentTime + i * 0.1);
+        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.3);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + i * 0.1); osc.stop(audioCtx.currentTime + i * 0.1 + 0.3);
+    });
 }
 
-function draw() {
-    let n = topics.length; let arc = Math.PI*2/n;
-    ctx.clearRect(0,0,600,600);
+function setDiff(d) {
+    difficulty = d;
+    document.getElementById('easyBtn').classList.toggle('active', d === 'easy');
+    document.getElementById('hellBtn').classList.toggle('active', d === 'hell');
+}
+
+function changeMode(days) {
+    if(isSpinning) return;
+    currentMode = days;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', parseInt(b.innerText) === days));
+    let saved = localStorage.getItem(`final_v1_mode_${days}`);
+    topics = saved ? JSON.parse(saved) : Array.from({length: days}, (_, i) => data.styles[i % data.styles.length]);
+    document.getElementById('dayDisplay').innerText = `DAY ${String(currentMode - topics.length + 1).padStart(2, '0')}`;
+    drawWheel();
+}
+
+function drawWheel() {
+    let n = topics.length || 1;
+    let arc = Math.PI*2/n; ctx.clearRect(0,0,800,800);
     for(let i=0; i<n; i++) {
-        ctx.fillStyle = `hsl(${(i*40)%360}, 50%, 40%)`;
-        ctx.beginPath(); ctx.moveTo(300,300); ctx.arc(300,300,280,i*arc,(i+1)*arc); ctx.fill();
+        ctx.fillStyle = `hsl(${(i*(360/Math.min(n,40)))%360}, 50%, 40%)`;
+        ctx.beginPath(); ctx.moveTo(400,400); ctx.arc(400,400,380,i*arc,(i+1)*arc); ctx.fill();
     }
+    ctx.beginPath(); ctx.arc(400,400,50,0,Math.PI*2); ctx.fillStyle="#0b0e14"; ctx.fill();
 }
 
 function spin() {
-    if(isSpinning) return; isSpinning = true;
-    let idx = Math.floor(Math.random()*topics.length);
-    canvas.style.transform = `rotate(${3600 + (360 - (idx*(360/topics.length)))}deg)`;
+    if(isSpinning || topics.length === 0) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    isSpinning = true; document.getElementById('spinBtn').disabled = true;
     
-    let t = 0; const int = setInterval(() => { if(t++ < 20) playSnd(800, 0.05); else clearInterval(int); }, 150);
+    let idx = Math.floor(Math.random()*topics.length);
+    let rot = currentRotation + (360*10) + (360 - (idx*(360/topics.length)) - (180/topics.length));
+    
+    let t = 0; const int = setInterval(() => { if(t++ < 25) playTick(); else clearInterval(int); }, 150);
+
+    canvas.style.transform = `rotate(${rot}deg)`;
+    currentRotation = rot;
 
     setTimeout(() => {
-        document.getElementById('resTitle').innerText = topics[idx];
-        document.getElementById('resSub').innerText = "核心主題：孤獨的城市";
-        playSnd(500, 0.5);
-        isSpinning = false;
+        const style = topics[idx];
+        const hellConstraint = difficulty === 'hell' ? `✕ ${data.hell[Math.floor(Math.random()*data.hell.length)]}` : "";
+        const issue = data.issues[Math.floor(Math.random()*data.issues.length)];
+        const currentDay = currentMode - topics.length + 1;
+        
+        document.getElementById('dayDisplay').innerText = `DAY ${String(currentDay).padStart(2, '0')}`;
+        document.getElementById('topicDisplay').innerHTML = `
+            <div class="res-style">MISSION START</div>
+            <div class="res-title">${style}</div>
+            ${difficulty === 'hell' ? `<div class="res-hell">${hellConstraint}</div>` : ''}
+            <div class="res-copy-box">
+                <div style="font-size:0.6rem; color:var(--primary); margin-bottom:5px;">SUBJECT</div>
+                <div style="font-size:1.4rem; font-weight:900; color:#fff;">${issue}</div>
+            </div>
+        `;
+
+        playWin();
+        if(window.navigator.vibrate) window.navigator.vibrate(200);
+        topics.splice(idx, 1);
+        localStorage.setItem(`final_v1_mode_${currentMode}`, JSON.stringify(topics));
+        isSpinning = false; document.getElementById('spinBtn').disabled = false;
+        setTimeout(drawWheel, 1000);
     }, 5000);
 }
 
-function genImg() {
-    html2canvas(document.getElementById('captureArea'), {backgroundColor:'#0b0e14', scale:2}).then(cv => {
-        document.getElementById('finalImg').src = cv.toDataURL();
-        document.getElementById('previewContainer').style.display = 'block';
-        window.scrollTo(0, document.body.scrollHeight);
-    });
+function resetCurrentMode() {
+    if(confirm("確定要重置進度嗎？")) {
+        localStorage.removeItem(`final_v1_mode_${currentMode}`);
+        changeMode(currentMode);
+    }
 }
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
