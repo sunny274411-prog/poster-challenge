@@ -3,205 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>POSTER CHALLENGE 1000</title>
+    <title>TAIWAN POSTER MISSION: 1000</title>
+    <script src="https://html2canvas.hertzen.com"></script>
     <style>
-        :root { 
-            --primary: #00f2fe; /* 科技藍 */
-            --accent: #4facfe; 
-            --gold: #f9d423; 
-            --bg: #0b0e14;
-            --glass: rgba(255, 255, 255, 0.05);
-        }
+        :root { --primary: #00f2fe; --accent: #ff4757; --gold: #f9d423; --bg: #0b0e14; --glass: rgba(255, 255, 255, 0.05); }
+        body { font-family: 'Inter', 'PingFang TC', sans-serif; background: var(--bg); color: #e0e0e0; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
         
-        body { 
-            font-family: 'Inter', 'PingFang TC', -apple-system, sans-serif;
-            background: radial-gradient(circle at top right, #1e2a44, #0b0e14);
-            color: #e0e0e0; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        /* 頂部導覽 */
-        .mode-selector { 
-            display: flex; gap: 8px; padding: 15px; 
-            background: var(--glass); backdrop-filter: blur(10px);
-            width: 100%; justify-content: center; position: sticky; top: 0; z-index: 100;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
+        /* 導覽列 */
+        .top-nav { width: 100%; background: var(--glass); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 10px 0; position: sticky; top: 0; z-index: 100; }
+        .selector-group { display: flex; justify-content: center; gap: 8px; }
+        .mode-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: 0.3s; }
+        .mode-btn.active { background: var(--primary); color: #000; font-weight: bold; border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
         
-        .mode-btn { 
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
-            color: #aaa; padding: 8px 14px; border-radius: 8px; cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-size: 0.8rem;
-        }
+        /* 難度切換 */
+        .diff-selector { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
+        .diff-btn { background: none; border: 2px solid #333; color: #666; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 0.9rem; }
+        .diff-btn.active.easy { border-color: #2ed573; color: #2ed573; }
+        .diff-btn.active.hell { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(255,71,87,0.2); }
+
+        /* 任務卡片 (截圖區) */
+        .mission-card { background: linear-gradient(145deg, #161b22, #0b0e14); border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 24px; width: 85vw; max-width: 380px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .day-tag { background: var(--gold); color: #000; padding: 2px 10px; border-radius: 4px; font-weight: 900; font-size: 0.8rem; }
         
-        .mode-btn.active { 
-            background: var(--primary); color: #000; font-weight: 700;
-            box-shadow: 0 0 15px var(--primary); border-color: var(--primary);
-        }
+        .wheel-box { position: relative; width: 100%; aspect-ratio: 1; margin-bottom: 20px; }
+        canvas { width: 100%; height: 100%; border-radius: 50%; border: 6px solid #1a1e26; transition: transform 5s cubic-bezier(0.15, 0, 0.2, 1); }
+        .pointer { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid var(--primary); z-index: 10; filter: drop-shadow(0 0 8px var(--primary)); }
 
-        /* 主標題 */
-        h1 { 
-            margin: 30px 0 5px; font-size: 1.8rem; letter-spacing: 2px; font-weight: 900;
-            background: linear-gradient(to right, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+        #spinBtn { background: #fff; border: none; width: 100%; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; transition: 0.3s; margin-bottom: 15px; letter-spacing: 1px; }
+        #spinBtn:disabled { background: #333; color: #555; }
+
+        /* 結果區 */
+        #topicDisplay { text-align: left; min-height: 140px; border-left: 3px solid var(--primary); padding-left: 15px; }
+        .res-style { color: var(--gold); font-size: 0.7rem; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; }
+        .res-title { font-size: 1.4rem; color: #fff; margin: 5px 0; font-weight: 800; }
+        .res-hell { color: var(--accent); font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; border: 1px dashed var(--accent); padding: 5px; display: inline-block; }
+        .res-copy-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.05); }
+
+        .screenshot-btn { background: none; border: 1px solid #444; color: #888; padding: 12px; border-radius: 10px; cursor: pointer; margin: 20px 0; width: 85vw; max-width: 380px; font-size: 0.85rem; font-weight: bold; }
+        .screenshot-btn:hover { background: #fff; color: #000; }
         
-        #stats { font-size: 0.75rem; color: #666; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* 轉盤容器卡片 */
-        .main-card {
-            background: var(--glass); border: 1px solid rgba(255,255,255,0.1);
-            padding: 30px 20px; border-radius: 30px; backdrop-filter: blur(20px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); width: 85vw; max-width: 440px;
-        }
-
-        .wheel-box { position: relative; margin: 0 auto; width: 100%; aspect-ratio: 1; }
-        
-        canvas { 
-            width: 100%; height: 100%; border-radius: 50%; 
-            border: 10px solid #1a1e26; box-shadow: inset 0 0 20px #000;
-            transition: transform 5s cubic-bezier(0.15, 0, 0.2, 1);
-        }
-
-        /* 霓虹指針 */
-        .pointer { 
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%); 
-            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; 
-            border-top: 35px solid var(--primary); z-index: 10;
-            filter: drop-shadow(0 0 10px var(--primary));
-        }
-
-        /* 啟動按鈕 */
-        #spinBtn { 
-            background: #fff; border: none; padding: 18px 60px; color: #000; 
-            font-size: 1.2rem; border-radius: 15px; cursor: pointer; margin-top: 30px; 
-            font-weight: 900; transition: 0.3s; width: 100%; max-width: 280px;
-            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
-        }
-        
-        #spinBtn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,242,254,0.3); }
-        #spinBtn:active { transform: scale(0.96); }
-        #spinBtn:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
-
-        /* 結果展示區 */
-        #result { margin-top: 40px; min-height: 120px; }
-        .result-label { font-size: 0.8rem; color: #555; margin-bottom: 10px; letter-spacing: 3px; }
-        #topicDisplay { 
-            font-size: 2.2rem; font-weight: 900; color: var(--primary);
-            text-shadow: 0 0 20px rgba(0,242,254,0.5); line-height: 1.2;
-        }
-
-        .reset-link { margin-top: 40px; font-size: 0.7rem; color: #333; cursor: pointer; transition: 0.3s; }
-        .reset-link:hover { color: #888; }
+        .reset-link { font-size: 0.7rem; color: #333; cursor: pointer; margin-bottom: 40px; text-decoration: underline; }
     </style>
 </head>
 <body>
 
-<div class="mode-selector">
-    <button class="mode-btn" onclick="changeMode(7)">7 DAYS</button>
-    <button class="mode-btn" onclick="changeMode(30)">30 DAYS</button>
-    <button class="mode-btn active" onclick="changeMode(100)">100 DAYS</button>
-    <button class="mode-btn" onclick="changeMode(365)">365 DAYS</button>
-    <button class="mode-btn" onclick="changeMode(1000)">1000 DAYS</button>
+<div class="top-nav">
+    <div class="selector-group">
+        <button class="mode-btn" onclick="changeMode(7)">7D</button>
+        <button class="mode-btn" onclick="changeMode(30)">30D</button>
+        <button class="mode-btn active" onclick="changeMode(100)">100D</button>
+        <button class="mode-btn" onclick="changeMode(365)">365D</button>
+        <button class="mode-btn" onclick="changeMode(1000)">1000D</button>
+    </div>
 </div>
 
-<h1>POSTER MISSION</h1>
-<div id="stats">REMAINING: <span id="count">0</span> / <span id="total">0</span></div>
+<div class="diff-selector">
+    <button id="easyBtn" class="diff-btn easy active" onclick="setDiff('easy')">輕鬆練習</button>
+    <button id="hellBtn" class="diff-btn hell" onclick="setDiff('hell')">設計師地獄</button>
+</div>
 
-<div class="main-card">
+<div class="mission-card" id="captureArea">
+    <div class="card-header">
+        <div style="font-size: 0.6rem; color: #555; letter-spacing: 1px;">POSTER CHALLENGE</div>
+        <div class="day-tag" id="dayDisplay">DAY --</div>
+    </div>
+
     <div class="wheel-box">
         <div class="pointer"></div>
         <canvas id="wheelCanvas" width="800" height="800"></canvas>
     </div>
 
-    <button id="spinBtn" onclick="spin()">SPIN THE WHEEL</button>
+    <button id="spinBtn" onclick="spin()">SPIN MISSION</button>
 
-    <div id="result">
-        <div class="result-label">— TODAY'S TOPIC —</div>
-        <div id="topicDisplay">READY?</div>
+    <div id="topicDisplay">
+        <div class="res-style">Status: Ready</div>
+        <div class="res-title">Awaiting Draw...</div>
     </div>
 </div>
 
-<div class="reset-link" onclick="resetCurrentMode()">RESET PROGRESS</div>
+<button class="screenshot-btn" onclick="takeScreenshot()">📷 儲存今日任務截圖</button>
+<div class="reset-link" onclick="resetCurrentMode()">重置當前進度</div>
 
 <script>
-// (保持之前的 JS 邏輯，但顏色稍微調暗以符合設計感)
-const matrix = {
-    styles: ["極簡主義","酸性設計","賽博龐克","瑞士風格","包浩斯","復古拼貼","波普藝術","蒸汽波","新醜風","幾何抽象","故障藝術","日系治癒","歐普藝術","野獸派","超現實","粗獷主義","孟菲斯","新古典","浮世繪","街頭塗鴉","擬物化","扁平化","達達主義","哥德風","重金屬","夢幻粉彩","像素藝術","水墨書法","電影質感","老雜誌風","霓虹燈光","報紙排版","未來主義","懷舊動漫","暗黑美學","剪影設計"],
-    elements: ["時光","深海","宇宙","森林","大腦","心跳","數據","齒輪","花卉","昆蟲","建築","迷宮","黑洞","流體","冰晶","煙霧","金屬","陶瓷","絲綢","沙漏"],
-    actions: ["轉譯","重構","碰撞","溶解","漂浮","碎裂","疊加","對話","隱藏","曝光"]
+const data = {
+    styles: [
+        "注音符號視覺化","老牌店標重構","宮廟霓虹美學","變電箱山水感","長輩圖色彩實驗","霓虹檳榔攤","台式拼貼風格",
+        "極簡主義","酸性設計","賽博龐克","瑞士風格","包浩斯","復古拼貼","波普藝術","蒸汽波","新醜風","幾何抽象",
+        "故障藝術","日系治癒","歐普藝術","野獸派","超現實","粗獷主義","孟菲斯","浮世繪","街頭塗鴉","擬物化",
+        "扁平化 2.0","達達主義","哥德風","像素藝術","水墨書法","電影質感","老雜誌風","未來主義","暗黑美學"
+    ],
+    hell: [
+        "禁止使用現成中文字體","僅限使用台式紅藍綠配色","加入檳榔攤跑馬燈效果","必須包含窗花或鐵捲門紋理",
+        "限制雙色(Duotone)","禁止使用任何圖片","僅限 3 種字體大小","必須垂直排版文字","文字必須發生重疊",
+        "加入大量 Grain 雜訊","強迫使用螢光色對比","以圓形作為視覺核心構圖","使用非對稱網格系統"
+    ],
+    issues: [
+        {t:"居住正義", s:"Housing Justice: Where is home?"},
+        {t:"數位孤獨", s:"Digital Loneliness in a connected world."},
+        {t:"永續轉型", s:"Sustainability: No Plan B for Earth."},
+        {t:"心理健康", s:"It's okay to not be okay."},
+        {t:"文化傳承", s:"Inheritance: Old soul, new form."},
+        {t:"假訊息", s:"Infodemic: Fighting the invisible virus."},
+        {t:"高齡社會", s:"Silver Age: Aging with dignity."},
+        {t:"性別平權", s:"Equality: Love is love."},
+        {t:"行人地獄", s:"Pedestrian Safety: Life over speed."},
+        {t:"網路霸凌", s:"Cyberbullying: Words have weight."}
+    ]
 };
 
-let currentMode = 100, topics = [], currentRotation = 0, isSpinning = false;
+let currentMode = 100, topics = [], currentRotation = 0, isSpinning = false, difficulty = 'easy';
 const canvas = document.getElementById('wheelCanvas'), ctx = canvas.getContext('2d');
 
-function generateTopics(n) {
-    let res = [];
-    while(res.length < n) {
-        let s = matrix.styles[Math.floor(Math.random()*matrix.styles.length)];
-        let e = matrix.elements[Math.floor(Math.random()*matrix.elements.length)];
-        let a = matrix.actions[Math.floor(Math.random()*matrix.actions.length)];
-        let combo = n <= 30 ? s : `${s}：${e}的${a}`;
-        if(!res.includes(combo)) res.push(combo);
-    }
-    return res.sort(() => Math.random() - 0.5);
+function setDiff(d) {
+    difficulty = d;
+    document.getElementById('easyBtn').classList.toggle('active', d === 'easy');
+    document.getElementById('hellBtn').classList.toggle('active', d === 'hell');
 }
 
 function changeMode(days) {
     if(isSpinning) return;
     currentMode = days;
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', parseInt(b.innerText) === days));
-    let saved = localStorage.getItem(`poster_v3_mode_${days}`);
-    topics = saved ? JSON.parse(saved) : generateTopics(days);
-    document.getElementById('total').innerText = days;
-    document.getElementById('topicDisplay').innerText = "？";
-    saveProgress();
+    let saved = localStorage.getItem(`vfinal_mode_${days}`);
+    topics = saved ? JSON.parse(saved) : generate1000Topics(days);
+    document.getElementById('dayDisplay').innerText = `DAY ${currentMode - topics.length + 1}`;
     drawWheel();
 }
 
-function saveProgress() { localStorage.setItem(`poster_v3_mode_${currentMode}`, JSON.stringify(topics)); }
+function generate1000Topics(n) {
+    let res = [];
+    while(res.length < n) {
+        let s = data.styles[Math.floor(Math.random()*data.styles.length)];
+        if(!res.includes(s) || n > 50) res.push(s);
+        if(res.length >= n) break;
+    }
+    return res;
+}
 
 function drawWheel() {
-    let n = topics.length; if(n === 0) return;
+    let n = topics.length || 1;
     let arc = Math.PI*2/n; ctx.clearRect(0,0,800,800);
     for(let i=0; i<n; i++) {
-        // 使用更深邃的色調
         ctx.fillStyle = `hsl(${(i*(360/Math.min(n,40)))%360}, 50%, 40%)`;
         ctx.beginPath(); ctx.moveTo(400,400); ctx.arc(400,400,380,i*arc,(i+1)*arc); ctx.fill();
-        ctx.strokeStyle = "rgba(0,0,0,0.3)"; ctx.lineWidth = 1; ctx.stroke();
+        ctx.strokeStyle = "rgba(0,0,0,0.2)"; ctx.stroke();
     }
     ctx.beginPath(); ctx.arc(400,400,50,0,Math.PI*2); ctx.fillStyle="#0b0e14"; ctx.fill();
-    document.getElementById('count').innerText = n;
 }
 
 function spin() {
     if(isSpinning || topics.length === 0) return;
     isSpinning = true; document.getElementById('spinBtn').disabled = true;
-    let prizeIndex = Math.floor(Math.random()*topics.length);
-    let arcDeg = 360/topics.length;
-    let rot = currentRotation + (360*8) + (360 - (prizeIndex*arcDeg) - (arcDeg/2));
+    let idx = Math.floor(Math.random()*topics.length);
+    let rot = currentRotation + (360*10) + (360 - (idx*(360/topics.length)) - (180/topics.length));
     canvas.style.transform = `rotate(${rot}deg)`;
     currentRotation = rot;
+
     setTimeout(() => {
-        document.getElementById('topicDisplay').innerText = topics[prizeIndex];
-        topics.splice(prizeIndex, 1);
-        saveProgress();
-        isSpinning = false;
-        document.getElementById('spinBtn').disabled = false;
+        const style = topics[idx];
+        const hellConstraint = difficulty === 'hell' ? `✕ ${data.hell[Math.floor(Math.random()*data.hell.length)]}` : "";
+        const issue = data.issues[Math.floor(Math.random()*data.issues.length)];
+        const currentDay = currentMode - topics.length + 1;
+        
+        document.getElementById('dayDisplay').innerText = `DAY ${String(currentDay).padStart(2, '0')}`;
+        document.getElementById('topicDisplay').innerHTML = `
+            <div class="res-style">MISSION START</div>
+            <div class="res-title">${style}</div>
+            ${difficulty === 'hell' ? `<div class="res-hell">${hellConstraint}</div>` : ''}
+            <div class="res-copy-box">
+                <div style="font-size:0.6rem; color:#666; letter-spacing:1px; margin-bottom:5px;">SOCIAL ISSUE & COPY</div>
+                <div style="font-size:1.3rem; font-weight:900; color:var(--primary);">${issue.t}</div>
+                <div style="font-size:0.8rem; color:#999; font-style:italic;">"${issue.s}"</div>
+            </div>
+        `;
+
+        topics.splice(idx, 1);
+        localStorage.setItem(`vfinal_mode_${currentMode}`, JSON.stringify(topics));
+        isSpinning = false; document.getElementById('spinBtn').disabled = false;
         setTimeout(drawWheel, 1000);
     }, 5000);
 }
 
+function takeScreenshot() {
+    const area = document.getElementById('captureArea');
+    html2canvas(area, { backgroundColor: "#0b0e14", scale: 3 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `PosterChallenge_Day.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+}
+
 function resetCurrentMode() {
-    if(confirm(`RESET ALL PROGRESS FOR ${currentMode} DAYS?`)) {
-        localStorage.removeItem(`poster_v3_mode_${currentMode}`);
+    if(confirm("確定要重置進度嗎？所有抽過的題目將會回來。")) {
+        localStorage.removeItem(`vfinal_mode_${currentMode}`);
         changeMode(currentMode);
     }
 }
+
 changeMode(100);
 </script>
 </body>
 </html>
+
+
