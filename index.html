@@ -3,24 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TAIWAN DESIGNER MISSION 1000</title>
-    <!-- 穩定版截圖套件 -->
-    <script src="https://cdnjs.cloudflare.com"></script>
+    <title>DESIGNER MISSION 1000: PRO SIGNATURE</title>
+    <script src="https://cdn.jsdelivr.net"></script>
     <style>
         :root { --primary: #00f2fe; --accent: #ff4757; --gold: #f9d423; --bg: #0b0e14; --glass: rgba(255, 255, 255, 0.05); }
         body { font-family: 'Inter', 'PingFang TC', sans-serif; background: var(--bg); color: #e0e0e0; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
         
-        /* 導覽列 */
         .top-nav { width: 100%; background: var(--glass); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 10px 0; position: sticky; top: 0; z-index: 100; }
         .selector-group { display: flex; justify-content: center; gap: 8px; }
         .mode-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: 0.3s; }
         .mode-btn.active { background: var(--primary); color: #000; font-weight: bold; border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
         
-        /* 趨勢輸入 */
         .trend-box { width: 85vw; max-width: 380px; margin: 15px 0; }
-        #trendInput { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #333; background: #161b22; color: #fff; font-size: 0.9rem; box-sizing: border-box; outline: none; }
+        #trendInput { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #333; background: #161b22; color: #fff; font-size: 0.9rem; outline: none; }
 
-        /* 難度切換 */
         .diff-selector { display: flex; justify-content: center; gap: 15px; margin: 10px 0; }
         .diff-btn { background: none; border: 2px solid #333; color: #666; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: 0.3s; }
         .diff-btn.active.easy { border-color: #2ed573; color: #2ed573; }
@@ -35,20 +31,22 @@
         canvas { width: 100%; height: 100%; border-radius: 50%; border: 6px solid #1a1e26; transition: transform 5s cubic-bezier(0.15, 0, 0.2, 1); }
         .pointer { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid var(--primary); z-index: 10; filter: drop-shadow(0 0 8px var(--primary)); }
 
-        #spinBtn { background: #fff; border: none; width: 100%; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; margin-bottom: 15px; letter-spacing: 1px; }
-        #spinBtn:disabled { background: #333; color: #555; }
+        #spinBtn { background: #fff; border: none; width: 100%; padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; margin-bottom: 15px; letter-spacing: 1px; color:#000; }
+        #spinBtn:disabled { background: #333; color: #666; }
 
-        /* 結果展示 */
-        #topicDisplay { text-align: left; min-height: 140px; border-left: 3px solid var(--primary); padding-left: 15px; }
+        #topicDisplay { text-align: left; min-height: 140px; border-left: 3px solid var(--primary); padding-left: 15px; position: relative; }
         .res-style { color: var(--gold); font-size: 0.7rem; letter-spacing: 2px; font-weight: bold; text-transform: uppercase; }
         .res-title { font-size: 1.4rem; color: #fff; margin: 5px 0; font-weight: 800; }
         .res-hell { color: var(--accent); font-size: 0.8rem; font-weight: bold; margin-bottom: 12px; border: 1px dashed var(--accent); padding: 4px 8px; display: inline-block; }
         .res-copy-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid rgba(0,242,254,0.3); }
 
+        /* 簽名標籤 */
+        #signLabel { position: absolute; bottom: 0; right: 0; font-size: 0.6rem; color: #444; font-style: italic; }
+
         .screenshot-btn { background: none; border: 1px solid #444; color: #888; padding: 15px; border-radius: 10px; cursor: pointer; margin: 20px 0; width: 85vw; max-width: 380px; font-size: 0.9rem; font-weight: bold; }
-        .reset-link { font-size: 0.7rem; color: #333; cursor: pointer; margin-bottom: 40px; }
-        
-        /* 截圖預覽層 */
+        .mute-btn { position: fixed; bottom: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: #888; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
+
+        /* 預覽視窗 */
         #screenshotOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
         #screenshotOverlay img { max-width: 100%; max-height: 75%; border-radius: 15px; border: 2px solid var(--primary); margin-bottom: 20px; }
     </style>
@@ -66,7 +64,7 @@
 </div>
 
 <div class="trend-box">
-    <input type="text" id="trendInput" placeholder="🔥 填入今日時事或網路梗 (選填)">
+    <input type="text" id="trendInput" placeholder="🔥 填入今日時事 (選填)">
 </div>
 
 <div class="diff-selector">
@@ -87,21 +85,64 @@
     <div id="topicDisplay">
         <div class="res-style">Status: Ready</div>
         <div class="res-title">Awaiting Draw...</div>
+        <div id="signLabel">@YOUR_ID</div>
     </div>
 </div>
 
-<button class="screenshot-btn" id="shotBtn" onclick="takeScreenshot()">📸 儲存任務卡片 (分享至 Threads/IG)</button>
-<div class="reset-link" onclick="resetCurrentMode()">重置當前進度</div>
+<button class="screenshot-btn" id="shotBtn" onclick="takeScreenshot()">📸 儲存任務卡片 (長按圖片儲存)</button>
+<div style="font-size:0.7rem; color:#444; cursor:pointer;" onclick="setSignature()">[ 點此修改簽名/IG ]</div>
 
-<!-- 截圖預覽容器 -->
+<button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+
 <div id="screenshotOverlay">
     <div style="color:var(--primary); font-weight:bold; margin-bottom:10px;">✨ 任務卡生成成功 ✨</div>
-    <div style="color:#aaa; font-size:0.8rem; margin-bottom:20px;">請【長按圖片】儲存至相簿</div>
+    <div style="color:#aaa; font-size:0.8rem; margin-bottom:20px;">請【長按圖片】儲存影像</div>
     <img id="screenshotImg" src="">
-    <button onclick="document.getElementById('screenshotOverlay').style.display='none'" style="background:#fff; border:none; padding:10px 30px; border-radius:10px; font-weight:bold;">關閉預覽</button>
+    <button onclick="document.getElementById('screenshotOverlay').style.display='none'" style="background:#fff; color:#000; border:none; padding:10px 30px; border-radius:10px; font-weight:bold;">關閉預覽</button>
 </div>
 
 <script>
+// 音效設定
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let isMuted = false;
+
+function playTick() {
+    if (isMuted) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.05);
+    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+}
+
+function playWin() {
+    if (isMuted) return;
+    [523.25, 659.25, 783.99].forEach((f, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(f, audioCtx.currentTime + i * 0.1);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.1 + 0.3);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + i * 0.1); osc.stop(audioCtx.currentTime + i * 0.1 + 0.3);
+    });
+}
+
+function toggleMute() { isMuted = !isMuted; document.getElementById('muteBtn').innerText = isMuted ? "🔇" : "🔊"; }
+
+// 簽名功能
+function setSignature() {
+    const id = prompt("請輸入你的 IG 帳號或簽名：", localStorage.getItem('poster_sig') || "@designer_name");
+    if (id) {
+        localStorage.setItem('poster_sig', id);
+        document.getElementById('signLabel').innerText = id;
+    }
+}
+
 const data = {
     styles: ["注音符號視覺化","老牌店標重構","宮廟霓虹美學","變電箱山水感","長輩圖色彩實驗","霓虹檳榔攤","台式拼貼風格","極簡主義","酸性設計","賽博龐克","瑞士風格","包浩斯","復古拼貼","波普藝術","蒸汽波","新醜風","幾何抽象","故障藝術","日系治癒","歐普藝術","野獸派","超現實","粗獷主義","孟菲斯","浮世繪","街頭塗鴉","擬物化","扁平化 2.0","達達主義","哥德風","像素藝術","水墨書法","電影質感","老雜誌風","未來主義","暗黑美學"],
     hell: ["禁止使用現成中文字體","僅限使用台式紅藍綠配色","加入檳榔攤跑馬燈效果","必須包含窗花或鐵捲門紋理","限制雙色(Duotone)","禁止使用任何圖片","僅限 3 種字體大小","必須垂直排版文字","文字必須發生重疊","加入大量 Grain 雜訊","強迫使用螢光色對比","以圓形核心構圖","使用非對稱網格"],
@@ -139,10 +180,15 @@ function drawWheel() {
 
 function spin() {
     if(isSpinning || topics.length === 0) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
     const trend = document.getElementById('trendInput').value.trim();
     isSpinning = true; document.getElementById('spinBtn').disabled = true;
     let idx = Math.floor(Math.random()*topics.length);
     let rot = currentRotation + (360*10) + (360 - (idx*(360/topics.length)) - (180/topics.length));
+    
+    let tickCount = 0;
+    const tickInterval = setInterval(() => { if(tickCount++ < 30) playTick(); else clearInterval(tickInterval); }, 150);
+
     canvas.style.transform = `rotate(${rot}deg)`;
     currentRotation = rot;
     setTimeout(() => {
@@ -150,8 +196,20 @@ function spin() {
         const hellConstraint = difficulty === 'hell' ? `✕ ${data.hell[Math.floor(Math.random()*data.hell.length)]}` : "";
         const finalTopic = trend ? trend : data.issues[Math.floor(Math.random()*data.issues.length)];
         const currentDay = currentMode - topics.length + 1;
+        const sig = localStorage.getItem('poster_sig') || "@your_id";
+        
         document.getElementById('dayDisplay').innerText = `DAY ${String(currentDay).padStart(2, '0')}`;
-        document.getElementById('topicDisplay').innerHTML = `<div class="res-style">MISSION START</div><div class="res-title">${style}</div>${difficulty==='hell'?`<div class="res-hell">${hellConstraint}</div>`:''}<div class="res-copy-box"><div style="font-size:0.6rem; color:var(--primary); letter-spacing:1px; margin-bottom:5px;">SUBJECT</div><div style="font-size:1.5rem; font-weight:900; color:#fff;">${finalTopic}</div></div>`;
+        document.getElementById('topicDisplay').innerHTML = `
+            <div class="res-style">MISSION START</div>
+            <div class="res-title">${style}</div>
+            ${difficulty==='hell'?`<div class="res-hell">${hellConstraint}</div>`:''}
+            <div class="res-copy-box">
+                <div style="font-size:0.6rem; color:var(--primary); letter-spacing:1px; margin-bottom:5px;">SUBJECT</div>
+                <div style="font-size:1.5rem; font-weight:900; color:#fff;">${finalTopic}</div>
+            </div>
+            <div id="signLabel" style="position:absolute; bottom:0; right:0; font-size:0.6rem; color:#444; font-style:italic;">${sig}</div>
+        `;
+        playWin();
         topics.splice(idx, 1);
         localStorage.setItem(`vfinal_mode_${currentMode}`, JSON.stringify(topics));
         isSpinning = false; document.getElementById('spinBtn').disabled = false;
@@ -160,27 +218,21 @@ function spin() {
 }
 
 function takeScreenshot() {
-    if (typeof html2canvas === 'undefined') { alert("載入中，請稍候再試..."); return; }
     const area = document.getElementById('captureArea');
-    const shotBtn = document.getElementById('shotBtn');
-    shotBtn.innerText = "📸 生成中...";
-    
-    html2canvas(area, { backgroundColor: "#0b0e14", scale: 2, useCORS: true }).then(canvas => {
-        const imgData = canvas.toDataURL("image/png");
-        document.getElementById('screenshotImg').src = imgData;
+    html2canvas(area, { backgroundColor: "#0b0e14", scale: 3, useCORS: true }).then(canvas => {
+        document.getElementById('screenshotImg').src = canvas.toDataURL("image/png");
         document.getElementById('screenshotOverlay').style.display = 'flex';
-        shotBtn.innerText = "📸 儲存任務卡片 (分享至 Threads/IG)";
-    }).catch(err => {
-        alert("截圖失敗，請嘗試手動截圖。");
-        shotBtn.innerText = "📸 儲存任務卡片 (分享至 Threads/IG)";
     });
 }
 
-function resetCurrentMode() { if(confirm("重置進度？")) { localStorage.removeItem(`vfinal_mode_${currentMode}`); changeMode(currentMode); } }
+// 初始簽名載入
+document.getElementById('signLabel').innerText = localStorage.getItem('poster_sig') || "@your_id";
 changeMode(100);
 </script>
 </body>
 </html>
+
+
 
 
 
